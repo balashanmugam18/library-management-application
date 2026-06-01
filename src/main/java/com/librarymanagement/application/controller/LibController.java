@@ -41,7 +41,7 @@ public class LibController {
     }
 
     @PostMapping("/transactions/borrow")
-    public ResponseEntity<?> transferBook(@RequestParam String memberId, @RequestParam String bookTitle) {
+    public ResponseEntity<?> transferBook(@RequestParam Long memberId, @RequestParam String bookTitle) {
         TransferBook responseBook = libService.transfer(memberId, bookTitle);
         return ResponseEntity.ok(responseBook);
     }

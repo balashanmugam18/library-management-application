@@ -48,7 +48,7 @@ public class LibService {
     }
 
     @Transactional
-    public TransferBook transfer(String memberId, String bookTitle) {
+    public TransferBook transfer(Long memberId, String bookTitle) {
 
 
         Optional<Member> member = memberRepository.findByMemberId(memberId);
