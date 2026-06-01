@@ -133,16 +133,8 @@ Run unit tests:
 
 Then exercise endpoints via Postman/Insomnia/curl.
 
-## ✅ Common issues & troubleshooting (observed in code)
-
-- Optional safety: validate `Optional` values before calling `.get()` in service methods to avoid `NoSuchElementException`.
-- Member ID type mismatch: `Member.memberId` is a `long` while `MemberRepository.findByMemberId` takes a `String` — fix one of them.
-- Repository vs service stereotypes: keep `@Repository` on repository classes and `@Service` on services to preserve semantics and exception translation.
-- Transaction import: prefer `org.springframework.transaction.annotation.Transactional` in Spring-managed services.
-
 ## 🧩 Next steps / TODOs
 
-- Fix `Member` / `MemberRepository` type mismatch.
 - Add unit + integration tests for `LibService.transfer(...)` asserting rollback behavior.
 - Add request validation for `BookRequest` and better error responses in `GlobalExceptionHandler`.
 - Add API documentation (OpenAPI/Swagger) and paging/filters for book search and members.
