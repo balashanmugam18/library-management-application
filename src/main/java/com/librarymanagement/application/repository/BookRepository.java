@@ -1,9 +1,9 @@
-package com.practice.librarymanagement.repository;
+package com.librarymanagement.application.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.practice.librarymanagement.entity.Book;
+import com.librarymanagement.application.entity.Book;
 import java.util.List;
 import java.util.Optional;
 

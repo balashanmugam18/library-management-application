@@ -1,4 +1,4 @@
-package com.practice.librarymanagement.controller;
+package com.librarymanagement.application.controller;
 
 import java.util.List;
 
@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.practice.librarymanagement.entity.Book;
-import com.practice.librarymanagement.entity.TransferBook;
-import com.practice.librarymanagement.model.BookRequest;
-import com.practice.librarymanagement.service.LibService;
+import com.librarymanagement.application.entity.Book;
+import com.librarymanagement.application.entity.TransferBook;
+import com.librarymanagement.application.model.BookRequest;
+import com.librarymanagement.application.service.LibService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 

@@ -1,8 +1,8 @@
-package com.practice.librarymanagement.entity;
+package com.librarymanagement.application.entity;
 
 
 
-import com.practice.librarymanagement.libEnum.Category;
+import com.librarymanagement.application.libEnum.Category;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

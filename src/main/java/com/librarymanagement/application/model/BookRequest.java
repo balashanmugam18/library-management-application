@@ -1,6 +1,6 @@
-package com.practice.librarymanagement.model;
+package com.librarymanagement.application.model;
 
-import com.practice.librarymanagement.libEnum.Category;
+import com.librarymanagement.application.libEnum.Category;
 
 import jakarta.validation.constraints.Min;
 

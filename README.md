@@ -1,46 +1,48 @@
 # 📚 Library Management — Spring Boot Backend
 
 ![Java-17-orange](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
-![SpringBoot-4.0.3-brightgreen](https://img.shields.io/badge/SpringBoot-4.0.3-brightgreen?style=for-the-badge&logo=springboot)
+![SpringBoot-4.x-brightgreen](https://img.shields.io/badge/SpringBoot-4.x-brightgreen?style=for-the-badge&logo=springboot)
 ![PostgreSQL-blue](https://img.shields.io/badge/PostgreSQL-blue?style=for-the-badge&logo=postgresql)
 ![Maven-Build-red](https://img.shields.io/badge/Maven-Build-red?style=for-the-badge&logo=apachemaven)
 
 ## 🚀 Overview
 
-A simple library management backend built with Spring Boot (4.x), JPA/Hibernate and PostgreSQL. The application manages books, members, and book transfers (holdings/loans) with basic validation and exception handling.
+Simple library management backend implemented with Spring Boot, JPA/Hibernate and a relational database. This project supports:
+- Managing books (title, author, isbn, category, copies)
+- Managing members and their active status
+- Borrow/transfer flow that creates a `TransferBook` (borrow record) and decrements available copies
+- Basic validation, custom exception handling and transactional service methods
 
-This repository contains a minimal service layer that coordinates multi-entity operations (for example transferring a book to a member) and demonstrates transactional boundaries, custom exceptions, repositories and REST controllers.
+The real package base in this repository is `com.librarymanagement.application` (check `src/main/java`). README content below reflects the actual code structure and endpoints.
 
 ## 🛠 Tech Stack
 
 - Java 17
 - Spring Boot 4.x (WebMVC, Data JPA)
-- Hibernate / JPA
+- Hibernate / JPA (Jakarta packages used in entities)
 - PostgreSQL (recommended) or H2 for quick testing
 - Maven
-- Lombok (may be used in entities)
 
-## ✅ Features
+## ✅ Features (implemented)
 
-- Book management: add books and query by author or title
-- Member management: store member details and active status
-- Transfer (loan) flow: create TransferBook records and decrement book stock
-- Custom exceptions for invalid operations and global exception handling
-- Basic validation and transactional service method for multi-entity changes
+- Add and query books (by author/title)
+- Create borrow/transfer records (TransferBook) for members
+- Global exception handling via `CustomException` & `GlobalExceptionHandler`
+- Transactional service method for the borrow flow to maintain data consistency
 
-## 📂 Project Structure
+## 📂 Project structure (actual)
 
 ```
 src
 ├── main
 │   ├── java
-│   │   └── com.practice.librarymanagement
-│   │       ├── controller        # REST controllers (e.g. LibController)
+│   │   └── com.librarymanagement.application
+│   │       ├── controller        # REST controllers (LibController)
 │   │       ├── entity            # JPA entities (Book, Member, TransferBook)
 │   │       ├── exception         # CustomException, GlobalExceptionHandler
-│   │       ├── libEnum           # Enums (e.g. Category)
-│   │       ├── model             # DTOs/requests/responses (BookRequest, ErrorResponse)
-│   │       ├── repository        # Spring Data repositories (BookRepository, MemberRepository, TransferBookRepository)
+│   │       ├── libEnum           # Enums (Category)
+│   │       ├── model             # DTOs (BookRequest)
+│   │       ├── repository        # Spring Data repositories
 │   │       └── service           # Business logic (LibService)
 │   └── resources
 │       └── application.properties
@@ -48,39 +50,59 @@ src
     └── java
 ```
 
-## 🔗 Key Components
+## 🔗 Key components and important fields
 
-- `Book` entity: title, author, isbn, category, availableCopies
-- `Member` entity: memberId (String), activeStatus (boolean)
-- `TransferBook` entity: links Book and Member with holdings, overDew and pending flags
-- `LibService`: service layer where `transfer(memberId, bookTitle)` coordinates checks and persistence
-- `LibController`: exposes REST endpoints to consume the service
-- `CustomException` / `GlobalExceptionHandler`: map domain errors to HTTP responses
+- `Book` (entity): `bookTitle` (unique), `isbn`, `author`, `category` (enum), `availableCopies` (Integer)
+- `Member` (entity): `memberId` (long), `memberShipType`, `email`, `activeStatus` (boolean)
+- `TransferBook` (entity): links `Book` and `Member`, fields: `holdings` (Integer), `overDew` (Integer), `isbn`, `pendingOverDew` (boolean)
+- `LibService`: contains business logic; critical method `transfer(String memberId, String bookTitle)` coordinates validations and writes
+- `LibController` (base path `/api`) exposes endpoints used by clients
 
-## 📡 API Endpoints (example)
+## 🗂 Config package
 
-Your controller exposes endpoints similar to the following (adjust paths & payloads according to your controller):
+There is a `config` package at `src/main/java/com/librarymanagement/application/config` containing application configuration classes:
+
+- `WebSecurityConfig.java` — defines a `SecurityFilterChain` bean. It whitelists Swagger endpoints (`/swagger-ui/**`, `/v3/api-docs/**`) and currently permits `/api/trades/**` and requires authentication for other requests. CSRF is disabled in that bean for simplicity. Review the whitelisted paths and change them to match your real endpoints (for example `/api/books/**` or `/api/transactions/**`) if needed.
+- `swaggerConfig.java` — provides an `OpenAPI` bean (springdoc) with basic API metadata (title, version, contact). This enables SpringDoc/OpenAPI UI if the `springdoc-openapi` dependency is present.
+
+Notes / recommendations:
+- The config classes are already present; they may have slightly different naming (e.g. `swaggerConfig` lower-cased). Consider renaming it to `SwaggerConfig` (class names should start with uppercase) for readability and consistency.
+- `WebSecurityConfig` currently permits `/swagger-ui/**` and `/v3/api-docs/**` so Swagger UI and API docs are accessible without authentication.
+- `WebSecurityConfig` also whitelists `/api/trades/**` (from an earlier project variant) — update this whitelist to match the actual controller paths in this repo (`/api/books/**`, `/api/transactions/**`, etc.) or remove it if you want those endpoints secured.
+
+Note: There is a repository method `MemberRepository.findByMemberId(String memberId)` but `Member.memberId` is declared as `long`. This mismatch should be resolved (either change repository signature to `Optional<Member> findByMemberId(Long memberId)` or change `Member.memberId` to `String`) — otherwise lookups may fail at runtime or not compile.
+
+## 📡 API Endpoints (from `LibController`)
+
+Base path: `/api`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET    | /books?author={author} | Get books by author |
-| POST   | /books | Add a new book (consumes BookRequest) |
-| POST   | /transfer | Transfer a book to a member (memberId, bookTitle) |
+| GET    | `/api` | Health check - returns "Backend working" |
+| GET    | `/api/books/search/{name}` | Get books by author name (path variable `name`) |
+| POST   | `/api/books` | Add a new book — accepts `BookRequest` JSON in request body |
+| POST   | `/api/transactions/borrow` | Borrow/transfer a book — requires `memberId` and `bookTitle` as request parameters |
 
-Exact paths and request shapes live in `LibController`.
+Example: borrow via curl
 
-## 🧭 Transactional guidance
+```
+curl -X POST "http://localhost:8080/api/transactions/borrow?memberId=123&bookTitle=MyBookTitle"
+```
 
-- The transfer flow modifies multiple entities (decrements book stock and creates a TransferBook). Put `@Transactional` on that service method so the changes are atomic and roll back on error.
-- Use `org.springframework.transaction.annotation.Transactional` for Spring transaction semantics.
-- `CustomException` extends `RuntimeException` so Spring will roll back transactions by default when it is thrown.
+Check `LibController.java` for exact request/response shapes.
+
+## 🧭 Transactional guidance (practical)
+
+- The borrow/transfer operation modifies multiple entities (decrements `Book.availableCopies` and creates a `TransferBook`). This method must be executed in a single transaction so either all changes succeed or none do.
+- Use `@Transactional` from `org.springframework.transaction.annotation.Transactional` on the service method (`LibService.transfer(...)`) for Spring-managed transactions.
+- `CustomException` extends `RuntimeException`, which will trigger rollback by default. If you need to roll back on checked exceptions, configure `rollbackFor` on `@Transactional`.
 
 ## ⚙ Configuration (example)
 
-Place DB credentials in `src/main/resources/application.properties`:
+Set DB credentials in `src/main/resources/application.properties`:
 
 ```
-# Database (Postgres example)
+# PostgreSQL example
 spring.datasource.url=jdbc:postgresql://localhost:5432/librarydb
 spring.datasource.username=your_username
 spring.datasource.password=your_password
@@ -92,43 +114,45 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-For quick testing you can switch to an embedded H2 profile.
+For quick local tests you can use H2 by adding a profile and switching the datasource URL.
 
 ## 🧪 Run & Test (Windows)
 
-From the project root run (Windows Command Prompt):
+From project root (Windows Command Prompt):
 
 ```
 .\mvnw.cmd clean package
 .\mvnw.cmd spring-boot:run
 ```
 
-Run tests:
+Run unit tests:
 
 ```
 .\mvnw.cmd test
 ```
 
-After the app starts, call your endpoints (Postman/Insomnia/curl). If Swagger/OpenAPI is configured, check `http://localhost:8080/swagger-ui.html` or the configured path.
+Then exercise endpoints via Postman/Insomnia/curl.
 
-## ✅ Common checks / Troubleshooting
+## ✅ Common issues & troubleshooting (observed in code)
 
-- If you see NoSuchElementException in the service, guard `Optional` before calling `.get()` (validate `isPresent()` first).
-- Check your `@Transactional` import — prefer `org.springframework.transaction.annotation.Transactional`.
-- Ensure repositories and services use correct stereotypes (`@Repository` for DAO implementations / Spring Data interfaces; `@Service` for business logic) so exception translation and AOP targeting behave as intended.
-- If using Spring Data JPA interfaces (extend `JpaRepository`), you usually don't need to annotate them — Spring Data creates proxies for you.
+- Optional safety: validate `Optional` values before calling `.get()` in service methods to avoid `NoSuchElementException`.
+- Member ID type mismatch: `Member.memberId` is a `long` while `MemberRepository.findByMemberId` takes a `String` — fix one of them.
+- Repository vs service stereotypes: keep `@Repository` on repository classes and `@Service` on services to preserve semantics and exception translation.
+- Transaction import: prefer `org.springframework.transaction.annotation.Transactional` in Spring-managed services.
 
-## 🧩 Development notes & TODOs
+## 🧩 Next steps / TODOs
 
-- Add unit and integration tests for `LibService.transfer(...)` to assert rollback on error scenarios.
-- Add validation (request DTO) and better error messages in `GlobalExceptionHandler`.
-- Add paging/filtering endpoints for books and members.
+- Fix `Member` / `MemberRepository` type mismatch.
+- Add unit + integration tests for `LibService.transfer(...)` asserting rollback behavior.
+- Add request validation for `BookRequest` and better error responses in `GlobalExceptionHandler`.
+- Add API documentation (OpenAPI/Swagger) and paging/filters for book search and members.
 - Consider adding authentication (JWT) and role-based access (admin vs member).
+---
 
 ## 👨‍💻 Author
-
 
 **Bala Shanmugam R**
 **| Java Backend Developer**
 
 ⭐ **Star this repo if you find it helpful!** 🚀
+

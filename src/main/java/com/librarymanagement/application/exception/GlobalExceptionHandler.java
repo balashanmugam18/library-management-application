@@ -1,10 +1,10 @@
-package com.practice.librarymanagement.exception;
+package com.librarymanagement.application.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.practice.librarymanagement.model.ErrorResponse;
+import com.librarymanagement.application.model.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

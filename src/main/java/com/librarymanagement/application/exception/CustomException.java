@@ -1,4 +1,4 @@
-package com.practice.librarymanagement.exception;
+package com.librarymanagement.application.exception;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

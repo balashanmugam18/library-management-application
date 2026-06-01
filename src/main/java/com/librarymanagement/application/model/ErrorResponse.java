@@ -1,4 +1,4 @@
-package com.practice.librarymanagement.model;
+package com.librarymanagement.application.model;
 
 public class ErrorResponse {
     public String code;

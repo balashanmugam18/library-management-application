@@ -1,7 +1,7 @@
-package com.practice.librarymanagement.repository;
+package com.librarymanagement.application.repository;
 
-import com.practice.librarymanagement.entity.Member;
-import com.practice.librarymanagement.entity.TransferBook;
+import com.librarymanagement.application.entity.Member;
+import com.librarymanagement.application.entity.TransferBook;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

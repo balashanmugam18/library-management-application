@@ -1,20 +1,20 @@
-package com.practice.librarymanagement.service;
-import com.practice.librarymanagement.repository.BookRepository;
-import com.practice.librarymanagement.repository.MemberRepository;
+package com.librarymanagement.application.service;
+import com.librarymanagement.application.repository.BookRepository;
+import com.librarymanagement.application.repository.MemberRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.practice.librarymanagement.repository.TransferBookRepository;
+import com.librarymanagement.application.repository.TransferBookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.practice.librarymanagement.entity.Book;
-import com.practice.librarymanagement.entity.Member;
-import com.practice.librarymanagement.entity.TransferBook;
-import com.practice.librarymanagement.exception.CustomException;
-import com.practice.librarymanagement.model.BookRequest;
+import com.librarymanagement.application.entity.Book;
+import com.librarymanagement.application.entity.Member;
+import com.librarymanagement.application.entity.TransferBook;
+import com.librarymanagement.application.exception.CustomException;
+import com.librarymanagement.application.model.BookRequest;
 
 @Service
 public class LibService {
