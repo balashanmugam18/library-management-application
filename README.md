@@ -68,9 +68,7 @@ There is a `config` package at `src/main/java/com/librarymanagement/application/
 Notes / recommendations:
 - The config classes are already present; they may have slightly different naming (e.g. `swaggerConfig` lower-cased). Consider renaming it to `SwaggerConfig` (class names should start with uppercase) for readability and consistency.
 - `WebSecurityConfig` currently permits `/swagger-ui/**` and `/v3/api-docs/**` so Swagger UI and API docs are accessible without authentication.
-- `WebSecurityConfig` also whitelists `/api/trades/**` (from an earlier project variant) — update this whitelist to match the actual controller paths in this repo (`/api/books/**`, `/api/transactions/**`, etc.) or remove it if you want those endpoints secured.
-
-Note: There is a repository method `MemberRepository.findByMemberId(String memberId)` but `Member.memberId` is declared as `long`. This mismatch should be resolved (either change repository signature to `Optional<Member> findByMemberId(Long memberId)` or change `Member.memberId` to `String`) — otherwise lookups may fail at runtime or not compile.
+- `WebSecurityConfig` also whitelists `/api/**` or remove it if you want those endpoints secured.
 
 ## 📡 API Endpoints (from `LibController`)
 
@@ -137,7 +135,7 @@ Then exercise endpoints via Postman/Insomnia/curl.
 
 - Add unit + integration tests for `LibService.transfer(...)` asserting rollback behavior.
 - Add request validation for `BookRequest` and better error responses in `GlobalExceptionHandler`.
-- Add API documentation (OpenAPI/Swagger) and paging/filters for book search and members.
+- Add paging & filters for book search and members.
 - Consider adding authentication (JWT) and role-based access (admin vs member).
 ---
 
